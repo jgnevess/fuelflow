@@ -1,8 +1,8 @@
 package br.com.joaonevesdev.fuelflow.api.service;
 
 import br.com.joaonevesdev.fuelflow.api.batch.CsvRecordProcessor;
-import br.com.joaonevesdev.fuelflow.api.model.Address;
-import br.com.joaonevesdev.fuelflow.api.model.FuelStation;
+import br.com.joaonevesdev.fuelflow.api.model.entity.Address;
+import br.com.joaonevesdev.fuelflow.api.model.entity.FuelStation;
 import br.com.joaonevesdev.fuelflow.api.repository.AddressRepository;
 import br.com.joaonevesdev.fuelflow.api.repository.FuelPriceRepository;
 import br.com.joaonevesdev.fuelflow.api.repository.FuelStationRepository;

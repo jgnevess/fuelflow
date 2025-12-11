@@ -1,6 +1,8 @@
 package br.com.joaonevesdev.fuelflow.api.repository;
 
-import br.com.joaonevesdev.fuelflow.api.model.FuelStation;
+import br.com.joaonevesdev.fuelflow.api.model.entity.FuelStation;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,7 +18,7 @@ public interface FuelStationRepository extends JpaRepository<FuelStation, String
 
     List<FuelStation> findByAddressMunicipality(String municipality);
 
-    List<FuelStation> findByAddressMunicipalityAndAddressState(String municipality, String state);
+    Page<FuelStation> findByAddressMunicipalityAndAddressState(Pageable pageable, String municipality, String state);
 
     List<FuelStation> findByAddressState(String state);
 

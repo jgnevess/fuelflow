@@ -1,4 +1,4 @@
-package br.com.joaonevesdev.fuelflow.api.model;
+package br.com.joaonevesdev.fuelflow.api.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

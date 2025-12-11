@@ -1,8 +1,8 @@
 package br.com.joaonevesdev.fuelflow.api.batch;
 
-import br.com.joaonevesdev.fuelflow.api.model.Address;
-import br.com.joaonevesdev.fuelflow.api.model.FuelPrice;
-import br.com.joaonevesdev.fuelflow.api.model.FuelStation;
+import br.com.joaonevesdev.fuelflow.api.model.entity.Address;
+import br.com.joaonevesdev.fuelflow.api.model.entity.FuelPrice;
+import br.com.joaonevesdev.fuelflow.api.model.entity.FuelStation;
 import br.com.joaonevesdev.fuelflow.api.repository.AddressRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

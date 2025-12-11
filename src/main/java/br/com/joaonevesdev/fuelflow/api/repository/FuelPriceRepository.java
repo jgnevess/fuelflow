@@ -1,6 +1,6 @@
 package br.com.joaonevesdev.fuelflow.api.repository;
 
-import br.com.joaonevesdev.fuelflow.api.model.FuelPrice;
+import br.com.joaonevesdev.fuelflow.api.model.entity.FuelPrice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
