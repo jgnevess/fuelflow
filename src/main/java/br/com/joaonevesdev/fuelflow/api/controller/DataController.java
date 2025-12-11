@@ -5,12 +5,17 @@ import br.com.joaonevesdev.fuelflow.api.repository.FuelPriceRepository;
 import br.com.joaonevesdev.fuelflow.api.repository.FuelStationRepository;
 import br.com.joaonevesdev.fuelflow.api.service.CsvImportService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,23 +23,33 @@ import java.util.Map;
 @RequestMapping("/api/v1/import")
 @RequiredArgsConstructor
 @Tag(name = "Import", description = "Importação de dados CSV")
-public class TestController {
+public class DataController {
 
     private final CsvImportService csvImportService;
     private final AddressRepository addressRepository;
     private final FuelStationRepository stationRepository;
     private final FuelPriceRepository priceRepository;
 
-    @PostMapping("/test")
+    @PostMapping(value = "/upload-csv",
+            consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     @Operation(summary = "Importar dados de teste do CSV")
-    public ResponseEntity<Map<String, Object>> importTestData(
-            @Parameter(description = "Número máximo de linhas a importar", example = "10")
-            @RequestParam(defaultValue = "10") int maxLines) {
 
+    public ResponseEntity<Map<String, Object>> importData(@RequestParam("file") MultipartFile file) throws IOException {
         Map<String, Object> response = new HashMap<>();
+        if (file.isEmpty()) {
+            response.put("success", false);
+            response.put("error", "Arquivo vazio!");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        Path dest = Paths.get("/tmp/uploads/data_csv.csv");
+
+        Files.createDirectories(dest.getParent());
+
+        file.transferTo(dest.toFile());
 
         try {
-            CsvImportService.ImportResult result = csvImportService.importTestFile(maxLines);
+            CsvImportService.ImportResult result = csvImportService.ImportFile(dest);
 
             response.put("success", result.isSuccess());
             response.put("message", result.getMessage());
@@ -51,7 +66,7 @@ public class TestController {
         }
     }
 
-    @DeleteMapping("/test/clear")
+//    @DeleteMapping("/test/clear")
     @Operation(summary = "Limpar todos os dados de teste")
     public ResponseEntity<Map<String, Object>> clearTestData() {
         Map<String, Object> response = new HashMap<>();

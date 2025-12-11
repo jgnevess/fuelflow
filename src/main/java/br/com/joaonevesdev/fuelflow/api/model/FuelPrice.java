@@ -1,5 +1,6 @@
 package br.com.joaonevesdev.fuelflow.api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -24,6 +25,7 @@ public class FuelPrice {
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "station_cnpj", nullable = false)
+    @JsonIgnore
     private FuelStation station;
 
     @Id

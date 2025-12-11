@@ -1,6 +1,8 @@
 package br.com.joaonevesdev.fuelflow.api.service;
 
 import br.com.joaonevesdev.fuelflow.api.batch.CsvRecordProcessor;
+import br.com.joaonevesdev.fuelflow.api.model.Address;
+import br.com.joaonevesdev.fuelflow.api.model.FuelStation;
 import br.com.joaonevesdev.fuelflow.api.repository.AddressRepository;
 import br.com.joaonevesdev.fuelflow.api.repository.FuelPriceRepository;
 import br.com.joaonevesdev.fuelflow.api.repository.FuelStationRepository;
@@ -10,12 +12,16 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 @Slf4j
 @Service
@@ -27,23 +33,24 @@ public class CsvImportService {
     private final FuelPriceRepository priceRepository;
     private final CsvRecordProcessor csvRecordProcessor;
 
-    @Transactional
-    public ImportResult importTestFile(int maxLines) {
-        try {
-            File testFile = new File("./data/csv/test/test_total.csv");
+    public ImportResult ImportFile(Path dest) throws IOException {
+        long maxLines = Files.lines(dest).count();
 
-            if (!testFile.exists()) {
-                return ImportResult.error("Arquivo de teste não encontrado: " + testFile.getAbsolutePath());
+        try {
+            File file = new File(dest.toUri());
+
+            if (!file.exists()) {
+                return ImportResult.error("Arquivo de teste não encontrado: " + file.getAbsolutePath());
             }
 
             log.info("Iniciando importação de teste (max {} linhas) do arquivo: {}",
-                    maxLines, testFile.getName());
+                    maxLines, file.getName());
 
             int linesProcessed = 0;
             int stationsCreated = 0;
             int pricesCreated = 0;
 
-            try (Reader reader = new FileReader(testFile, StandardCharsets.ISO_8859_1);
+            try (Reader reader = new FileReader(file, StandardCharsets.ISO_8859_1);
                  CSVParser csvParser = CSVFormat.DEFAULT
                          .withDelimiter(';')
                          .withFirstRecordAsHeader()
@@ -51,6 +58,7 @@ public class CsvImportService {
                          .withTrim()
                          .parse(reader)) {
 
+                int limit = 0;
                 for (CSVRecord record : csvParser) {
                     if (linesProcessed >= maxLines) {
                         log.info("Limite de {} linhas atingido", maxLines);
@@ -62,25 +70,29 @@ public class CsvImportService {
                                 csvRecordProcessor.processRecord(record);
 
                         if (result != null) {
-                            if (result.address.getId() == null) {
-                                addressRepository.save(result.address);
-                            }
+                            boolean createdStation = false;
 
-                            if (!stationRepository.existsById(result.station.getCnpj())) {
-                                stationRepository.save(result.station);
+                            createdStation = saveLine(result);
+
+                            linesProcessed++;
+
+                            if (createdStation) {
                                 stationsCreated++;
                             }
 
-                            priceRepository.save(result.price);
                             pricesCreated++;
-
-                            linesProcessed++;
 
                             if (linesProcessed % 10 == 0) {
                                 log.info("Processadas {} linhas...", linesProcessed);
                             }
-                        }
 
+                            if (limit == 500) {
+                                limit = 0;
+                                Thread.sleep(500);
+                            } else {
+                                limit++;
+                            }
+                        }
                     } catch (Exception e) {
                         log.warn("Erro ao processar linha {}: {}",
                                 record.getRecordNumber(), e.getMessage());
@@ -99,6 +111,32 @@ public class CsvImportService {
             return ImportResult.error(e.getMessage());
         }
     }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public boolean saveLine(CsvRecordProcessor.ProcessingResult r) {
+
+        Address address = addressRepository.findByHash(r.address.getHash())
+                .orElseGet(() -> addressRepository.save(r.address));
+
+
+        boolean createdStation = false;
+
+        FuelStation station = stationRepository.findByCnpj(r.station.getCnpj()).orElse(null);
+
+        if (station == null) {
+            station = r.station;
+            station.setAddress(address); // garantir FK
+            stationRepository.save(station);
+            createdStation = true;
+        }
+
+        r.price.setStation(station);
+        priceRepository.save(r.price);
+
+        return createdStation;
+    }
+
+
 
     @Transactional
     public void clearTestData() {

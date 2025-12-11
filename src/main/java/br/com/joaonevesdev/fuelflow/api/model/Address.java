@@ -1,5 +1,6 @@
 package br.com.joaonevesdev.fuelflow.api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -56,6 +57,7 @@ public static class FuelPriceId {
     @Column(unique = true, length = 32)
     private String hash;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "address", fetch = FetchType.LAZY)
     @Builder.Default
     private List<FuelStation> stations = new ArrayList<>();
