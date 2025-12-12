@@ -20,6 +20,8 @@ public interface FuelStationRepository extends JpaRepository<FuelStation, String
 
     Page<FuelStation> findByAddressMunicipalityAndAddressState(Pageable pageable, String municipality, String state);
 
+    Page<FuelStation> findByAddressMunicipalityAndAddressStateAndAddressNeighborhood(Pageable pageable, String municipality, String state, String neighborhood);
+
     List<FuelStation> findByAddressState(String state);
 
     List<FuelStation> findByBrand(String brand);

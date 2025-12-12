@@ -1,24 +1,42 @@
 package br.com.joaonevesdev.fuelflow.api.model.dto;
 
 import br.com.joaonevesdev.fuelflow.api.model.entity.Address;
+import br.com.joaonevesdev.fuelflow.api.model.entity.FuelPrice;
 import br.com.joaonevesdev.fuelflow.api.model.entity.FuelStation;
 import lombok.Data;
 
-import java.util.List;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Data
 public class FuelStationResponse {
+    private String cnpj;
     private String name;
     private String brand;
     private boolean active;
     private String fullAddress;
-    private List<FuelPriceResponse> prices;
+    private List<FuelPriceResponse> historyPrices;
+    private Map<String, BigDecimal> latestPrices;
 
     public FuelStationResponse(FuelStation fuelStation) {
+        this.cnpj = fuelStation.getCnpj();
         this.name = fuelStation.getName();
         this.brand = fuelStation.getBrand();
         this.active = fuelStation.getActive();
-        this.prices = fuelStation.getPrices().stream().map(FuelPriceResponse::new).toList();
+        this.historyPrices = fuelStation.getPrices().stream().map(FuelPriceResponse::new).toList();
+        this.latestPrices = new HashMap<>();
+        this.latestPrices = fuelStation.getPrices().stream()
+                .collect(Collectors.groupingBy(
+                        FuelPrice::getProduct,
+                        Collectors.collectingAndThen(
+                                Collectors.maxBy(Comparator.comparing(FuelPrice::getCollectionDate)),
+                                optional -> optional.map(FuelPrice::getSalePrice).orElse(null)
+                        )
+                ));
+
+
+
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder
                 .append(fuelStation.getAddress().getStreet())

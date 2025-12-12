@@ -66,7 +66,7 @@ public class DataController {
         }
     }
 
-//    @DeleteMapping("/test/clear")
+    @DeleteMapping("/test/clear")
     @Operation(summary = "Limpar todos os dados de teste")
     public ResponseEntity<Map<String, Object>> clearTestData() {
         Map<String, Object> response = new HashMap<>();

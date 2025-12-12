@@ -1,15 +1,11 @@
 package br.com.joaonevesdev.fuelflow.api.controller;
 
 import br.com.joaonevesdev.fuelflow.api.model.dto.FuelStationResponse;
-import br.com.joaonevesdev.fuelflow.api.model.entity.FuelStation;
 import br.com.joaonevesdev.fuelflow.api.service.FuelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/v1/fuel")
@@ -21,8 +17,20 @@ public class FuelController {
     @GetMapping("municipality")
     public ResponseEntity<Page<FuelStationResponse>> getAllByMunicipality(
             @RequestParam String municipality, @RequestParam String state,
-            @RequestParam int pageNumber, @RequestParam int pageSize) {
-        return ResponseEntity.ok(fuelService.getAllByMunicipality(municipality, state, pageNumber, pageSize));
+            @RequestParam int pageNumber) {
+        return ResponseEntity.ok(fuelService.getAllByMunicipality(municipality, state, pageNumber));
+    }
+
+    @GetMapping("neighborhood")
+    public ResponseEntity<Page<FuelStationResponse>> getAllByMunicipality(
+            @RequestParam String municipality, @RequestParam String state, @RequestParam String neighborhood,
+            @RequestParam int pageNumber) {
+        return ResponseEntity.ok(fuelService.getByCnpj(municipality, state, neighborhood, pageNumber));
+    }
+
+    @GetMapping("find/{cnpj}/data")
+    public ResponseEntity<FuelStationResponse> getAllByMunicipality(@PathVariable String cnpj) {
+        return ResponseEntity.ok(fuelService.getByCnpj(cnpj));
     }
 
 
