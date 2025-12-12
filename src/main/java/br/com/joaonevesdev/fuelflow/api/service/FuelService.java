@@ -97,41 +97,12 @@ public class FuelService {
 
         }
 
-        gas = gas.divide(
-                BigDecimal.valueOf(gasi),
-                2,
-                RoundingMode.HALF_UP
-        );
-
-        gasAd = gasAd.divide(
-                BigDecimal.valueOf(gasAdi),
-                2,
-                RoundingMode.HALF_UP
-        );
-
-        et = et.divide(
-                BigDecimal.valueOf(eti),
-                2,
-                RoundingMode.HALF_UP
-        );
-
-        dies = dies.divide(
-                BigDecimal.valueOf(diesi),
-                2,
-                RoundingMode.HALF_UP
-        );
-
-        s10 = s10.divide(
-                BigDecimal.valueOf(s10i),
-                2,
-                RoundingMode.HALF_UP
-        );
-
-        gnv = gnv.divide(
-                BigDecimal.valueOf(gnvi),
-                2,
-                RoundingMode.HALF_UP
-        );
+        gas = avg(gas, gasi);
+        gasAd = avg(gasAd, gasAdi);
+        et = avg(et, eti);
+        dies = avg(dies, diesi);
+        s10 = avg(s10, s10i);
+        gnv = avg(gnv, gnvi);
 
         response.put("GASOLINA", gas);
         response.put("GASOLINA ADITIVADA", gasAd);
@@ -142,5 +113,12 @@ public class FuelService {
 
         return response;
     }
+
+    private BigDecimal avg(BigDecimal total, int count) {
+        return count == 0
+                ? BigDecimal.ZERO
+                : total.divide(BigDecimal.valueOf(count), 2, RoundingMode.HALF_UP);
+    }
+
 
 }
