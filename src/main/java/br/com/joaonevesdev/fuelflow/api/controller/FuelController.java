@@ -1,5 +1,6 @@
 package br.com.joaonevesdev.fuelflow.api.controller;
 
+import br.com.joaonevesdev.fuelflow.api.model.dto.FuelPriceResponse;
 import br.com.joaonevesdev.fuelflow.api.model.dto.FuelStationResponse;
 import br.com.joaonevesdev.fuelflow.api.service.FuelService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +29,13 @@ public class FuelController {
         return ResponseEntity.ok(fuelService.getByCnpj(municipality, state, neighborhood, pageNumber));
     }
 
-    @GetMapping("find/{cnpj}/data")
+    @GetMapping("station/{cnpj}")
     public ResponseEntity<FuelStationResponse> getAllByMunicipality(@PathVariable String cnpj) {
         return ResponseEntity.ok(fuelService.getByCnpj(cnpj));
     }
 
-
+    @GetMapping("municipality/{state}/{municipality}/avg")
+    public ResponseEntity<?> getAvgByMunicipality(@PathVariable String state, @PathVariable String municipality) {
+        return ResponseEntity.ok(fuelService.getAverage(state, municipality));
+    }
 }
