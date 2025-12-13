@@ -4,11 +4,12 @@ import br.com.joaonevesdev.fuelflow.api.model.entity.FuelPrice;
 import br.com.joaonevesdev.fuelflow.api.util.StringFormat;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
-public class FuelPriceResponse {
+public class FuelPriceResponse implements Serializable {
     private LocalDate collectionDate;
     private String product;
     private BigDecimal salePrice;

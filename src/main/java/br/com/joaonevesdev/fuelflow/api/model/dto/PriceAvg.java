@@ -7,10 +7,11 @@ import lombok.Data;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Data
-public class PriceAvg {
+public class PriceAvg implements Serializable {
 
     @JsonSerialize(using = BigDecimalTwoScaleSerializer.class)
     private BigDecimal gasolina;

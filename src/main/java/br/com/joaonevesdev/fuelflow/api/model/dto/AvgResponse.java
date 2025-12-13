@@ -2,8 +2,10 @@ package br.com.joaonevesdev.fuelflow.api.model.dto;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class AvgResponse<T> {
+public class AvgResponse<T> implements Serializable {
     private Location location;
     private T results;
     private String context;

@@ -7,6 +7,7 @@ import br.com.joaonevesdev.fuelflow.api.repository.FuelPriceRepository;
 import br.com.joaonevesdev.fuelflow.api.repository.FuelStationRepository;
 import br.com.joaonevesdev.fuelflow.api.util.StringFormat;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -42,6 +43,10 @@ public class FuelService {
         return new FuelStationResponse(fuelStation);
     }
 
+    @Cacheable(
+            value = "avg_by_location",
+            key = "#state + ':' + #municipality + ':' + (#neighborhood == null ? 'ANY' : #neighborhood)"
+    )
     public AvgResponse getAverage(String state, String municipality, String neighborhood) {
         List<FuelPrice> prices = fuelPriceRepository.findByNeighborhood(municipality, state, neighborhood);
         PriceAvg priceAvg = setMapAvg(prices);
@@ -49,6 +54,10 @@ public class FuelService {
         return new AvgResponse(location, priceAvg, "MEDIA_POR_BAIRRO");
     }
 
+    @Cacheable(
+            value = "avg_by_location",
+            key = "#state + ':' + #municipality + ':' + (#neighborhood == null ? 'ANY' : #neighborhood)"
+    )
     public AvgResponse getAverage(String state, String municipality) {
         List<FuelPrice> prices = fuelPriceRepository.findByCity(municipality, state);
         PriceAvg priceAvg = setMapAvg(prices);
@@ -56,6 +65,10 @@ public class FuelService {
         return new AvgResponse(location, priceAvg, "MEDIA_POR_CIDADE");
     }
 
+    @Cacheable(
+            value = "cheapest_by_location",
+            key = "#state + ':' + #municipality + ':' + (#neighborhood == null ? 'ANY' : #neighborhood)"
+    )
     public Cheapest getCheapest(String state, String municipality, String product) {
         List<FuelPrice> prices = fuelPriceRepository.findLatestByCity(municipality, state, product);
         FuelStation fuelStation = null;
@@ -85,6 +98,10 @@ public class FuelService {
         return cheapestResponse;
     }
 
+    @Cacheable(
+            value = "top_prices_by_location",
+            key = "#state + ':' + #municipality + ':' + (#neighborhood == null ? 'ANY' : #neighborhood)"
+    )
     public AvgResponse getTopPrices(String state, String municipality, String product) {
         List<FuelPrice> fuelPrices = fuelPriceRepository.findByCityAndProduct(municipality, state, product);
         Map<FuelStation, List<FuelPrice>> pricesByStation = fuelPrices.stream()
@@ -102,6 +119,10 @@ public class FuelService {
         return avgResponse;
     }
 
+    @Cacheable(
+            value = "worst_prices_by_location",
+            key = "#state + ':' + #municipality + ':' + (#neighborhood == null ? 'ANY' : #neighborhood)"
+    )
     public AvgResponse getWorstPrices(String state, String municipality, String product) {
         List<FuelPrice> fuelPrices = fuelPriceRepository.findByCityAndProduct(municipality, state, product);
         Map<FuelStation, List<FuelPrice>> pricesByStation = fuelPrices.stream()

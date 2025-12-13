@@ -3,8 +3,10 @@ package br.com.joaonevesdev.fuelflow.api.model.dto;
 import br.com.joaonevesdev.fuelflow.api.util.StringFormat;
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class Location {
+public class Location implements Serializable {
     private String state;
     private String city;
     private String neighborhood;

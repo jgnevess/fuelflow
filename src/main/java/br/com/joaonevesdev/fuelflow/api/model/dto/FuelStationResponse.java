@@ -6,12 +6,13 @@ import br.com.joaonevesdev.fuelflow.api.model.entity.FuelStation;
 import br.com.joaonevesdev.fuelflow.api.util.StringFormat;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Data
-public class FuelStationResponse {
+public class FuelStationResponse implements Serializable {
     private String cnpj;
     private String name;
     private String brand;
