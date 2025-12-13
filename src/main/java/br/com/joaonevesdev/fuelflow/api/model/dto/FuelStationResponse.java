@@ -3,6 +3,7 @@ package br.com.joaonevesdev.fuelflow.api.model.dto;
 import br.com.joaonevesdev.fuelflow.api.model.entity.Address;
 import br.com.joaonevesdev.fuelflow.api.model.entity.FuelPrice;
 import br.com.joaonevesdev.fuelflow.api.model.entity.FuelStation;
+import br.com.joaonevesdev.fuelflow.api.util.StringFormat;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -21,8 +22,8 @@ public class FuelStationResponse {
 
     public FuelStationResponse(FuelStation fuelStation) {
         this.cnpj = fuelStation.getCnpj();
-        this.name = fuelStation.getName();
-        this.brand = fuelStation.getBrand();
+        this.name = StringFormat.format(fuelStation.getName());
+        this.brand = StringFormat.format(fuelStation.getBrand());
         this.active = fuelStation.getActive();
         this.historyPrices = fuelStation.getPrices().stream().map(FuelPriceResponse::new).toList();
         this.latestPrices = new HashMap<>();
@@ -48,7 +49,7 @@ public class FuelStationResponse {
                 .append(fuelStation.getAddress().getMunicipality())
                 .append(", ")
                 .append(fuelStation.getAddress().getState());
-        this.fullAddress = stringBuilder.toString();
+        this.fullAddress = StringFormat.format(stringBuilder.toString());
 
 
     }

@@ -127,5 +127,4 @@ public class FuelService {
                 : total.divide(BigDecimal.valueOf(count), 2, RoundingMode.HALF_UP);
     }
 
-
 }
