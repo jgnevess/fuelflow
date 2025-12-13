@@ -109,7 +109,7 @@ public class FuelService {
         int gnvi = 0;
 
         for (FuelPrice f : prices) {
-            switch (f.getProduct()) {
+            switch (f.getProduct().toUpperCase()) {
                 case "GASOLINA":
                     gasi++;
                     gas = gas.add(f.getSalePrice());

@@ -1,6 +1,7 @@
 package br.com.joaonevesdev.fuelflow.api.model.dto;
 
 import br.com.joaonevesdev.fuelflow.api.model.entity.FuelPrice;
+import br.com.joaonevesdev.fuelflow.api.util.StringFormat;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -15,7 +16,7 @@ public class FuelPriceResponse {
 
     public FuelPriceResponse(FuelPrice fuelPrice) {
         this.collectionDate = fuelPrice.getCollectionDate();
-        this.product = fuelPrice.getProduct();
+        this.product = StringFormat.format(fuelPrice.getProduct());
         this.salePrice = fuelPrice.getSalePrice();
         this.measurementUnit = fuelPrice.getMeasurementUnit();
     }
