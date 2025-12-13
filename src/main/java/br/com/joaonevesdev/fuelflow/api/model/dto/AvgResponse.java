@@ -3,12 +3,14 @@ package br.com.joaonevesdev.fuelflow.api.model.dto;
 import lombok.Data;
 
 @Data
-public class AvgResponse {
+public class AvgResponse<T> {
     private Location location;
-    private PriceAvg averages;
+    private T results;
+    private String context;
 
-    public AvgResponse(Location location, PriceAvg averages) {
+    public AvgResponse(Location location, T results, String context) {
         this.location = location;
-        this.averages = averages;
+        this.results = results;
+        this.context = context;
     }
 }

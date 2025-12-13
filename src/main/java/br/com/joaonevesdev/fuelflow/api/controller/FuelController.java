@@ -50,4 +50,11 @@ public class FuelController {
         if(response == null) return ResponseEntity.badRequest().build();
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("{state}/{municipality}/top-prices")
+    public ResponseEntity<?> test(@PathVariable String state, @PathVariable String municipality, @RequestParam String product) {
+        var response = fuelService.getTopPrices(state, municipality, product);
+        if(response == null) return ResponseEntity.badRequest().build();
+        return ResponseEntity.ok(response);
+    }
 }

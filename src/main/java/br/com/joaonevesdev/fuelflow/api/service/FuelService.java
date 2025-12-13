@@ -14,10 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,14 +46,14 @@ public class FuelService {
         List<FuelPrice> prices = fuelPriceRepository.findByNeighborhood(municipality, state, neighborhood);
         PriceAvg priceAvg = setMapAvg(prices);
         Location location = new Location(state, municipality, neighborhood);
-        return new AvgResponse(location, priceAvg);
+        return new AvgResponse(location, priceAvg, "MEDIA_POR_BAIRRO");
     }
 
     public AvgResponse getAverage(String state, String municipality) {
         List<FuelPrice> prices = fuelPriceRepository.findByCity(municipality, state);
         PriceAvg priceAvg = setMapAvg(prices);
         Location location = new Location(state, municipality);
-        return new AvgResponse(location, priceAvg);
+        return new AvgResponse(location, priceAvg, "MEDIA_POR_CIDADE");
     }
 
     public Cheapest getCheapest(String state, String municipality, String product) {
@@ -86,6 +83,64 @@ public class FuelService {
         context.put("state", StringFormat.format(state));
         cheapestResponse.setContext(context);
         return cheapestResponse;
+    }
+
+    public AvgResponse getTopPrices(String state, String municipality, String product) {
+        List<FuelPrice> fuelPrices = fuelPriceRepository.findByCityAndProduct(municipality, state, product);
+        Map<FuelStation, List<FuelPrice>> pricesByStation = fuelPrices.stream()
+                .collect(Collectors.groupingBy(FuelPrice::getStation));
+
+        List<StationSummary> stationSummaries = pricesByStation.entrySet().stream()
+                .filter(entry -> entry.getValue().size() >= 3)
+                .map(entry -> createStationSummary(entry.getKey(), entry.getValue()))
+                .sorted(Comparator.comparing(StationSummary::getAveragePrice).reversed())
+                .limit(3)
+                .collect(Collectors.toList());
+        Location location = new Location(state, municipality);
+        AvgResponse avgResponse = new AvgResponse<>(location, stationSummaries, "TOP_3_MELHORES_PREÇOS_POR_CIDADE");
+
+        return avgResponse;
+    }
+
+    private StationSummary createStationSummary(FuelStation station, List<FuelPrice> prices) {
+        List<FuelPrice> sortedPrices = prices.stream()
+                .sorted(Comparator.comparing(FuelPrice::getCollectionDate).reversed())
+                .collect(Collectors.toList());
+
+        BigDecimal averagePrice = prices.stream()
+                .map(FuelPrice::getSalePrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .divide(BigDecimal.valueOf(prices.size()), 2, RoundingMode.HALF_UP);
+
+        BigDecimal minPrice = prices.stream()
+                .map(FuelPrice::getSalePrice)
+                .min(Comparator.naturalOrder())
+                .orElse(BigDecimal.ZERO);
+
+        BigDecimal maxPrice = prices.stream()
+                .map(FuelPrice::getSalePrice)
+                .max(Comparator.naturalOrder())
+                .orElse(BigDecimal.ZERO);
+
+        List<BigDecimal> last3Prices = sortedPrices.stream()
+                .limit(3)
+                .map(FuelPrice::getSalePrice)
+                .collect(Collectors.toList());
+
+        StringBuilder address = new StringBuilder(station.getAddress().getStreet());
+        address.append(", ")
+                .append(station.getNumber() == null ? station.getComplement() : station.getNumber())
+                .append(", ")
+                .append(station.getAddress().getMunicipality())
+                .append(", ")
+                .append(station.getAddress().getState());
+
+        return StationSummary.builder()
+                .averagePrice(averagePrice)
+                .minPrice(minPrice)
+                .maxPrice(maxPrice)
+                .last3Prices(last3Prices)
+                .build();
     }
 
     private PriceAvg setMapAvg(List<FuelPrice> prices) {
@@ -155,5 +210,4 @@ public class FuelService {
                 ? null
                 : total.divide(BigDecimal.valueOf(count), 2, RoundingMode.HALF_UP);
     }
-
 }

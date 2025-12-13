@@ -68,4 +68,17 @@ public interface FuelPriceRepository extends JpaRepository<FuelPrice, Long> {
             @Param("product") String product
     );
 
+    @Query("""
+            SELECT fp
+            FROM FuelPrice fp
+            WHERE fp.product = :product
+              AND  fp.station.address.municipality = :municipality
+              AND fp.station.address.state = :state
+            """)
+    List<FuelPrice> findByCityAndProduct(
+            @Param("municipality") String municipality,
+            @Param("state") String state,
+            @Param("product") String product
+    );
+
 }
