@@ -93,11 +93,28 @@ public class FuelService {
         List<StationSummary> stationSummaries = pricesByStation.entrySet().stream()
                 .filter(entry -> entry.getValue().size() >= 3)
                 .map(entry -> createStationSummary(entry.getKey(), entry.getValue()))
-                .sorted(Comparator.comparing(StationSummary::getAveragePrice).reversed())
+                .sorted(Comparator.comparing(StationSummary::getAveragePrice))
                 .limit(3)
                 .collect(Collectors.toList());
         Location location = new Location(state, municipality);
         AvgResponse avgResponse = new AvgResponse<>(location, stationSummaries, "TOP_3_MELHORES_PREÇOS_POR_CIDADE");
+
+        return avgResponse;
+    }
+
+    public AvgResponse getWorstPrices(String state, String municipality, String product) {
+        List<FuelPrice> fuelPrices = fuelPriceRepository.findByCityAndProduct(municipality, state, product);
+        Map<FuelStation, List<FuelPrice>> pricesByStation = fuelPrices.stream()
+                .collect(Collectors.groupingBy(FuelPrice::getStation));
+
+        List<StationSummary> stationSummaries = pricesByStation.entrySet().stream()
+                .filter(entry -> entry.getValue().size() >= 3)
+                .map(entry -> createStationSummary(entry.getKey(), entry.getValue()))
+                .sorted(Comparator.comparing(StationSummary::getAveragePrice).reversed())
+                .limit(3)
+                .collect(Collectors.toList());
+        Location location = new Location(state, municipality);
+        AvgResponse avgResponse = new AvgResponse<>(location, stationSummaries, "TOP_3_PIORES_PREÇOS_POR_CIDADE");
 
         return avgResponse;
     }
@@ -140,6 +157,7 @@ public class FuelService {
                 .minPrice(minPrice)
                 .maxPrice(maxPrice)
                 .last3Prices(last3Prices)
+                .stationName(StringFormat.format(station.getName()))
                 .build();
     }
 

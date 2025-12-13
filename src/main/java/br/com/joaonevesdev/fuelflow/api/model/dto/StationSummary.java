@@ -20,6 +20,7 @@ public class StationSummary {
     private BigDecimal minPrice;
     private BigDecimal maxPrice;
     private List<BigDecimal> last3Prices;
+    private String stationName;
 
     public BigDecimal getPriceVariation() {
         return maxPrice.subtract(minPrice);
