@@ -34,13 +34,20 @@ public class FuelController {
         return ResponseEntity.ok(fuelService.getByCnpj(cnpj));
     }
 
-    @GetMapping("municipality/{state}/{municipality}/avg")
+    @GetMapping("{state}/{municipality}/avg")
     public ResponseEntity<?> getAvgByMunicipality(@PathVariable String state, @PathVariable String municipality) {
         return ResponseEntity.ok(fuelService.getAverage(state, municipality));
     }
 
-    @GetMapping("municipality/{state}/{municipality}/{neighborhood}/avg")
+    @GetMapping("{state}/{municipality}/{neighborhood}/avg")
     public ResponseEntity<?> getAvgByMunicipality(@PathVariable String state, @PathVariable String municipality, @PathVariable String neighborhood) {
         return ResponseEntity.ok(fuelService.getAverage(state, municipality, neighborhood));
+    }
+
+    @GetMapping("{state}/{municipality}/cheapest")
+    public ResponseEntity<?> getCheapest(@PathVariable String state, @PathVariable String municipality, @RequestParam String product) {
+        var response = fuelService.getCheapest(state, municipality, product);
+        if(response == null) return ResponseEntity.badRequest().build();
+        return ResponseEntity.ok(response);
     }
 }

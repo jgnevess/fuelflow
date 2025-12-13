@@ -1,13 +1,11 @@
 package br.com.joaonevesdev.fuelflow.api.service;
 
-import br.com.joaonevesdev.fuelflow.api.model.dto.AvgResponse;
-import br.com.joaonevesdev.fuelflow.api.model.dto.FuelStationResponse;
-import br.com.joaonevesdev.fuelflow.api.model.dto.Location;
-import br.com.joaonevesdev.fuelflow.api.model.dto.PriceAvg;
+import br.com.joaonevesdev.fuelflow.api.model.dto.*;
 import br.com.joaonevesdev.fuelflow.api.model.entity.FuelPrice;
 import br.com.joaonevesdev.fuelflow.api.model.entity.FuelStation;
 import br.com.joaonevesdev.fuelflow.api.repository.FuelPriceRepository;
 import br.com.joaonevesdev.fuelflow.api.repository.FuelStationRepository;
+import br.com.joaonevesdev.fuelflow.api.util.StringFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,9 +14,11 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class FuelService {
@@ -57,6 +57,35 @@ public class FuelService {
         PriceAvg priceAvg = setMapAvg(prices);
         Location location = new Location(state, municipality);
         return new AvgResponse(location, priceAvg);
+    }
+
+    public Cheapest getCheapest(String state, String municipality, String product) {
+        List<FuelPrice> prices = fuelPriceRepository.findLatestByCity(municipality, state, product);
+        FuelStation fuelStation = null;
+        BigDecimal cheapest = null;
+        for(var p : prices) {
+            if(fuelStation == null || cheapest == null || p.getSalePrice().compareTo(cheapest) < 0) {
+                fuelStation = p.getStation();
+                cheapest = p.getSalePrice();
+            }
+        }
+
+        Cheapest cheapestResponse = new Cheapest();
+        MinimalFuelStation minimalFuelStation = new MinimalFuelStation();
+        if (fuelStation == null) {
+            return null;
+        }
+        minimalFuelStation.setCnpj(StringFormat.format(fuelStation.getCnpj()));
+        minimalFuelStation.setName(StringFormat.format(fuelStation.getName()));
+        minimalFuelStation.setNeighborhood(StringFormat.format(fuelStation.getAddress().getNeighborhood()));
+        cheapestResponse.setCheapestPrice(cheapest);
+        cheapestResponse.setProduct(StringFormat.format(product));
+        cheapestResponse.setStation(minimalFuelStation);
+        Map<String, String> context = new HashMap<>();
+        context.put("city", StringFormat.format(municipality));
+        context.put("state", StringFormat.format(state));
+        cheapestResponse.setContext(context);
+        return cheapestResponse;
     }
 
     private PriceAvg setMapAvg(List<FuelPrice> prices) {
