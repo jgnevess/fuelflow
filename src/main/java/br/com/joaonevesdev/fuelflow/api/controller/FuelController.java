@@ -38,4 +38,9 @@ public class FuelController {
     public ResponseEntity<?> getAvgByMunicipality(@PathVariable String state, @PathVariable String municipality) {
         return ResponseEntity.ok(fuelService.getAverage(state, municipality));
     }
+
+    @GetMapping("municipality/{state}/{municipality}/{neighborhood}/avg")
+    public ResponseEntity<?> getAvgByMunicipality(@PathVariable String state, @PathVariable String municipality, @PathVariable String neighborhood) {
+        return ResponseEntity.ok(fuelService.getAverage(state, municipality, neighborhood));
+    }
 }

@@ -1,6 +1,9 @@
 package br.com.joaonevesdev.fuelflow.api.service;
 
+import br.com.joaonevesdev.fuelflow.api.model.dto.AvgResponse;
 import br.com.joaonevesdev.fuelflow.api.model.dto.FuelStationResponse;
+import br.com.joaonevesdev.fuelflow.api.model.dto.Location;
+import br.com.joaonevesdev.fuelflow.api.model.dto.PriceAvg;
 import br.com.joaonevesdev.fuelflow.api.model.entity.FuelPrice;
 import br.com.joaonevesdev.fuelflow.api.model.entity.FuelStation;
 import br.com.joaonevesdev.fuelflow.api.repository.FuelPriceRepository;
@@ -13,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,9 +45,21 @@ public class FuelService {
         return new FuelStationResponse(fuelStation);
     }
 
-    public Map<String, BigDecimal> getAverage(String state, String municipality) {
+    public AvgResponse getAverage(String state, String municipality, String neighborhood) {
+        List<FuelPrice> prices = fuelPriceRepository.findByNeighborhood(municipality, state, neighborhood);
+        PriceAvg priceAvg = setMapAvg(prices);
+        Location location = new Location(state, municipality, neighborhood);
+        return new AvgResponse(location, priceAvg);
+    }
+
+    public AvgResponse getAverage(String state, String municipality) {
         List<FuelPrice> prices = fuelPriceRepository.findByCity(municipality, state);
-        Map<String, BigDecimal> response = new HashMap<>();
+        PriceAvg priceAvg = setMapAvg(prices);
+        Location location = new Location(state, municipality);
+        return new AvgResponse(location, priceAvg);
+    }
+
+    private PriceAvg setMapAvg(List<FuelPrice> prices) {
 
         BigDecimal gas = new BigDecimal(0);
         int gasi = 0;
@@ -104,19 +118,12 @@ public class FuelService {
         s10 = avg(s10, s10i);
         gnv = avg(gnv, gnvi);
 
-        response.put("GASOLINA", gas);
-        response.put("GASOLINA ADITIVADA", gasAd);
-        response.put("ETANOL", et);
-        response.put("DIESEL", dies);
-        response.put("DIESEL S10", s10);
-        response.put("GNV", gnv);
-
-        return response;
+        return new PriceAvg(gas, gasAd, et, s10, dies, gnv);
     }
 
     private BigDecimal avg(BigDecimal total, int count) {
         return count == 0
-                ? BigDecimal.ZERO
+                ? null
                 : total.divide(BigDecimal.valueOf(count), 2, RoundingMode.HALF_UP);
     }
 
