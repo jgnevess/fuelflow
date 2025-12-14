@@ -38,17 +38,23 @@ public class FuelService {
                 .map(FuelStationResponse::new);
     }
 
+    @Cacheable(
+            value = "station",
+            key = "#cnpj"
+    )
     public FuelStationResponse getByCnpj(String cnpj) {
-        FuelStation fuelStation = fuelStationRepository.findByCnpj(cnpj).orElseThrow();
+        FuelStation fuelStation = fuelStationRepository.findByCnpj(cnpj).orElse(null);
+        if (fuelStation == null) return null;
         return new FuelStationResponse(fuelStation);
     }
 
     @Cacheable(
-            value = "avg_by_location",
-            key = "#state + ':' + #municipality + ':' + (#neighborhood == null ? 'ANY' : #neighborhood)"
+            value = "avg_by_location_neighborhood",
+            key = "#state + ':' + #municipality + ':' + #neighborhood"
     )
     public AvgResponse getAverage(String state, String municipality, String neighborhood) {
         List<FuelPrice> prices = fuelPriceRepository.findByNeighborhood(municipality, state, neighborhood);
+        if (prices.isEmpty()) return null;
         PriceAvg priceAvg = setMapAvg(prices);
         Location location = new Location(state, municipality, neighborhood);
         return new AvgResponse(location, priceAvg, "MEDIA_POR_BAIRRO");
@@ -56,10 +62,11 @@ public class FuelService {
 
     @Cacheable(
             value = "avg_by_location",
-            key = "#state + ':' + #municipality + ':' + (#neighborhood == null ? 'ANY' : #neighborhood)"
+            key = "#state + ':' + #municipality"
     )
     public AvgResponse getAverage(String state, String municipality) {
         List<FuelPrice> prices = fuelPriceRepository.findByCity(municipality, state);
+        if (prices.isEmpty()) return null;
         PriceAvg priceAvg = setMapAvg(prices);
         Location location = new Location(state, municipality);
         return new AvgResponse(location, priceAvg, "MEDIA_POR_CIDADE");
@@ -67,7 +74,7 @@ public class FuelService {
 
     @Cacheable(
             value = "cheapest_by_location",
-            key = "#state + ':' + #municipality + ':' + (#neighborhood == null ? 'ANY' : #neighborhood)"
+            key = "#state + ':' + #municipality + ':' + #product"
     )
     public Cheapest getCheapest(String state, String municipality, String product) {
         List<FuelPrice> prices = fuelPriceRepository.findLatestByCity(municipality, state, product);
@@ -100,10 +107,11 @@ public class FuelService {
 
     @Cacheable(
             value = "top_prices_by_location",
-            key = "#state + ':' + #municipality + ':' + (#neighborhood == null ? 'ANY' : #neighborhood)"
+            key = "#state + ':' + #municipality + ':' + #product"
     )
     public AvgResponse getTopPrices(String state, String municipality, String product) {
         List<FuelPrice> fuelPrices = fuelPriceRepository.findByCityAndProduct(municipality, state, product);
+        if(fuelPrices.isEmpty()) return null;
         Map<FuelStation, List<FuelPrice>> pricesByStation = fuelPrices.stream()
                 .collect(Collectors.groupingBy(FuelPrice::getStation));
 
@@ -115,16 +123,16 @@ public class FuelService {
                 .collect(Collectors.toList());
         Location location = new Location(state, municipality);
         AvgResponse avgResponse = new AvgResponse<>(location, stationSummaries, "TOP_3_MELHORES_PREÇOS_POR_CIDADE");
-
         return avgResponse;
     }
 
     @Cacheable(
             value = "worst_prices_by_location",
-            key = "#state + ':' + #municipality + ':' + (#neighborhood == null ? 'ANY' : #neighborhood)"
+            key = "#state + ':' + #municipality + ':' + #product"
     )
     public AvgResponse getWorstPrices(String state, String municipality, String product) {
         List<FuelPrice> fuelPrices = fuelPriceRepository.findByCityAndProduct(municipality, state, product);
+        if(fuelPrices.isEmpty()) return null;
         Map<FuelStation, List<FuelPrice>> pricesByStation = fuelPrices.stream()
                 .collect(Collectors.groupingBy(FuelPrice::getStation));
 
