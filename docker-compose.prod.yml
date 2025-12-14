@@ -1,0 +1,35 @@
+services:
+  api:
+    build: .
+    image: fuelflow-api
+    container_name: fuelflow-api
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - app_data:/data
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: fuelflow-postgres
+    environment:
+      POSTGRES_DB: fuelflow
+      POSTGRES_USER: fuelflow_joao_user
+      POSTGRES_PASSWORD: Pc3P9LswUCge4zuVireg
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: fuelflow-redis
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  app_data:
