@@ -2,7 +2,7 @@ FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
 
-COPY target/fuelflow-api.jar app.jar
+COPY target/*.jar app.jar
 
 EXPOSE 8080
 

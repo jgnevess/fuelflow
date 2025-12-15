@@ -52,11 +52,11 @@ public class FuelController {
                     )
             )
     })
-    @GetMapping("municipality")
+    @GetMapping("city")
     public ResponseEntity<Page<FuelStationResponse>> getAllByMunicipality(
-            @RequestParam String municipality, @RequestParam String state,
+            @RequestParam String city, @RequestParam String state,
             @RequestParam int pageNumber) {
-        String normalizedMunicipality = normalizer.normalize(municipality);
+        String normalizedMunicipality = normalizer.normalize(city);
         String normalizedState = normalizer.normalizeUF(state);
         return ResponseEntity.ok(fuelService.getAllByMunicipality(normalizedMunicipality, normalizedState, pageNumber));
     }
@@ -77,9 +77,9 @@ public class FuelController {
     })
     @GetMapping("neighborhood")
     public ResponseEntity<Page<FuelStationResponse>> getAllByMunicipality(
-            @RequestParam String municipality, @RequestParam String state, @RequestParam String neighborhood,
+            @RequestParam String city, @RequestParam String state, @RequestParam String neighborhood,
             @RequestParam int pageNumber) {
-        String normalizedMunicipality = normalizer.normalize(municipality);
+        String normalizedMunicipality = normalizer.normalize(city);
         String normalizedState = normalizer.normalizeUF(state);
         String normalizedNeighborhood = normalizer.normalize(neighborhood);
         return ResponseEntity.ok(fuelService.getByCnpj(normalizedMunicipality, normalizedState, normalizedNeighborhood, pageNumber));
@@ -124,9 +124,9 @@ public class FuelController {
             @ApiResponse(responseCode = "404", description = "Localização não encontrada"),
             @ApiResponse(responseCode = "500", description = "Erro interno")
     })
-    @GetMapping("{state}/{municipality}/avg")
-    public ResponseEntity<?> getAvgByMunicipality(@PathVariable String state, @PathVariable String municipality) {
-        String normalizedMunicipality = normalizer.normalize(municipality);
+    @GetMapping("{state}/{city}/avg")
+    public ResponseEntity<?> getAvgByMunicipality(@PathVariable String state, @PathVariable String city) {
+        String normalizedMunicipality = normalizer.normalize(city);
         String normalizedState = normalizer.normalizeUF(state);
         var res = fuelService.getAverage(normalizedState, normalizedMunicipality);
         if (res == null) return ResponseEntity.status(404).build();
@@ -147,9 +147,9 @@ public class FuelController {
             @ApiResponse(responseCode = "404", description = "Localização não encontrada"),
             @ApiResponse(responseCode = "500", description = "Erro interno")
     })
-    @GetMapping("{state}/{municipality}/{neighborhood}/avg")
-    public ResponseEntity<?> getAvgByMunicipality(@PathVariable String state, @PathVariable String municipality, @PathVariable String neighborhood) {
-        String normalizedMunicipality = normalizer.normalize(municipality);
+    @GetMapping("{state}/{city}/{neighborhood}/avg")
+    public ResponseEntity<?> getAvgByMunicipality(@PathVariable String state, @PathVariable String city, @PathVariable String neighborhood) {
+        String normalizedMunicipality = normalizer.normalize(city);
         String normalizedState = normalizer.normalizeUF(state);
         String normalizedNeighborhood = normalizer.normalize(neighborhood);
         var res = fuelService.getAverage(normalizedState, normalizedMunicipality, normalizedNeighborhood);
@@ -170,9 +170,9 @@ public class FuelController {
             @ApiResponse(responseCode = "404", description = "Localização não encontrada"),
             @ApiResponse(responseCode = "500", description = "Erro interno")
     })
-    @GetMapping("{state}/{municipality}/cheapest")
-    public ResponseEntity<?> getCheapest(@PathVariable String state, @PathVariable String municipality, @RequestParam String product) {
-        String normalizedMunicipality = normalizer.normalize(municipality);
+    @GetMapping("{state}/{city}/cheapest")
+    public ResponseEntity<?> getCheapest(@PathVariable String state, @PathVariable String city, @RequestParam String product) {
+        String normalizedMunicipality = normalizer.normalize(city);
         String normalizedState = normalizer.normalizeUF(state);
         String normalizedProduct = normalizer.normalize(product);
         var response = fuelService.getCheapest(normalizedState, normalizedMunicipality, normalizedProduct);
@@ -193,9 +193,9 @@ public class FuelController {
             @ApiResponse(responseCode = "404", description = "Localização não encontrada"),
             @ApiResponse(responseCode = "500", description = "Erro interno")
     })
-    @GetMapping("{state}/{municipality}/top-prices")
-    public ResponseEntity<?> getTopPrices(@PathVariable String state, @PathVariable String municipality, @RequestParam String product) {
-        String normalizedMunicipality = normalizer.normalize(municipality);
+    @GetMapping("{state}/{city}/top-prices")
+    public ResponseEntity<?> getTopPrices(@PathVariable String state, @PathVariable String city, @RequestParam String product) {
+        String normalizedMunicipality = normalizer.normalize(city);
         String normalizedState = normalizer.normalizeUF(state);
         String normalizedProduct = normalizer.normalize(product);
         var response = fuelService.getTopPrices(normalizedState, normalizedMunicipality, normalizedProduct);
@@ -216,9 +216,9 @@ public class FuelController {
             @ApiResponse(responseCode = "404", description = "Localização não encontrada"),
             @ApiResponse(responseCode = "500", description = "Erro interno")
     })
-    @GetMapping("{state}/{municipality}/worst-prices")
-    public ResponseEntity<?> getWorstPrices(@PathVariable String state, @PathVariable String municipality, @RequestParam String product) {
-        String normalizedMunicipality = normalizer.normalize(municipality);
+    @GetMapping("{state}/{city}/worst-prices")
+    public ResponseEntity<?> getWorstPrices(@PathVariable String state, @PathVariable String city, @RequestParam String product) {
+        String normalizedMunicipality = normalizer.normalize(city);
         String normalizedState = normalizer.normalizeUF(state);
         String normalizedProduct = normalizer.normalize(product);
         var response = fuelService.getWorstPrices(normalizedState, normalizedMunicipality, normalizedProduct);

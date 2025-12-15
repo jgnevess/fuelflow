@@ -1,33 +1,54 @@
-services:
-  api:
-    build: .
-    image: fuelflow-api
-    container_name: fuelflow-api
-    ports:
-      - "8080:8080"
-    environment:
-      SPRING_PROFILES_ACTIVE: prod
-    depends_on:
-      - postgres
-      - redis
-    volumes:
-      - app_data:/data
-    restart: unless-stopped
+version: '3.8'
 
+services:
   postgres:
     image: postgres:16-alpine
     container_name: fuelflow-postgres
     environment:
-      POSTGRES_DB: fuelflow
+      POSTGRES_DB: fuelflow_db
       POSTGRES_USER: fuelflow_joao_user
       POSTGRES_PASSWORD: Pc3P9LswUCge4zuVireg
+    ports:
+      - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data_prod
+    healthcheck:  # ← ADICIONE ESTE HEALTHCHECK
+      test: ["CMD-SHELL", "pg_isready -U fuelflow_joao_user -d fuelflow_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
     restart: unless-stopped
 
   redis:
     image: redis:7-alpine
     container_name: fuelflow-redis
+    restart: unless-stopped
+    healthcheck:  # ← ADICIONE TAMBÉM PARA REDIS
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    image: jgneves/fuelflow-api
+    container_name: fuelflow-api
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/fuelflow_db
+      SPRING_DATASOURCE_USERNAME: fuelflow_joao_user
+      SPRING_DATASOURCE_PASSWORD: Pc3P9LswUCge4zuVireg
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: "6379"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - app_data:/data
     restart: unless-stopped
 
 volumes:
