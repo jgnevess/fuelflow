@@ -44,6 +44,7 @@ jobs:
           host: ${{ secrets.SERVER_IP }}
           username: ubuntu
           key: ${{ secrets.SSH_KEY }}
+          port: '7642'
 
           script: |
             echo "Acessando diretório de deploy..."
