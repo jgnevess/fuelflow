@@ -1,5 +1,6 @@
 package br.com.joaonevesdev.fuelflow.api.repository;
 
+import br.com.joaonevesdev.fuelflow.api.model.dto.CheapestRow;
 import br.com.joaonevesdev.fuelflow.api.model.entity.FuelPrice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -81,4 +82,45 @@ public interface FuelPriceRepository extends JpaRepository<FuelPrice, Long> {
             @Param("product") String product
     );
 
+    @Query(value = """
+        select new com.fuelflow.dto.CheapestRow(
+            fp.salePrice,
+            fs.cnpj,
+            fs.name,
+            a.neighborhood
+        )
+        from FuelPrice fp
+        join fp.station fs
+        join fs.address a
+        where fp.product = :product
+          and a.municipality = :municipality
+          and a.state = :state
+          and fp.collectionDate = (
+              select max(fp2.collectionDate)
+              from FuelPrice fp2
+              where fp2.station = fp.station
+                and fp2.product = fp.product
+          )
+        order by fp.salePrice asc
+    """, nativeQuery = true)
+    List<CheapestRow> findCheapest(
+            @Param("municipality") String municipality,
+            @Param("state") String state,
+            @Param("product") String product
+    );
+
+    @Query("""
+    select fp
+    from FuelPrice fp
+    join fetch fp.station s
+    join fetch s.address
+    where fp.id.product = :product
+      and s.address.municipality = :municipality
+      and s.address.state = :state
+    """)
+    List<FuelPrice> findByCityAndProductFetched(
+            @Param("municipality") String municipality,
+            @Param("state") String state,
+            @Param("product") String product
+    );
 }
