@@ -65,10 +65,10 @@ public class FuelService {
         return new AvgResponse(location, priceAvg, "MEDIA_POR_BAIRRO");
     }
 
-//    @Cacheable(
-//            value = "avg_by_location",
-//            key = "#state + ':' + #city"
-//    )
+    @Cacheable(
+            value = "avg_by_location",
+            key = "#state + ':' + #city"
+    )
     public AvgResponse getAverage(String state, String city) {
         log.info("BUSCANDO NO BANCO - Key do cache: addresses::{}", city);
         List<FuelPrice> prices = fuelPriceRepository.findByCity(city, state);
