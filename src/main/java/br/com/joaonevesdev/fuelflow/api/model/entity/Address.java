@@ -96,11 +96,11 @@ public static class FuelPriceId {
                                         String municipality, String state,
                                         String region, String cep) {
         return Address.builder()
-                .street(street != null ? street.trim() : null)
-                .neighborhood(neighborhood != null ? neighborhood.trim() : null)
-                .municipality(municipality != null ? municipality.trim() : null)
-                .state(state != null ? state.trim() : null)
-                .region(region != null ? region.trim() : null)
+                .street(street != null ? street.trim().toLowerCase() : null)
+                .neighborhood(neighborhood != null ? neighborhood.trim().toLowerCase() : null)
+                .municipality(municipality != null ? municipality.trim().toLowerCase() : null)
+                .state(state != null ? state.trim().toUpperCase() : null)
+                .region(region != null ? region.trim().toLowerCase() : null)
                 .cep(cep != null ? cep.trim() : null)
                 .build();
     }
