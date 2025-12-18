@@ -83,32 +83,27 @@ public class FuelService {
             key = "#state + ':' + #city + ':' + #product"
     )
     public Cheapest getCheapest(String state, String city, String product) {
-        List<FuelPrice> prices = fuelPriceRepository.findLatestByCity(city, state, product);
-        FuelStation fuelStation = null;
-        BigDecimal cheapest = null;
-        for(var p : prices) {
-            if(fuelStation == null || cheapest == null || p.getSalePrice().compareTo(cheapest) < 0) {
-                fuelStation = p.getStation();
-                cheapest = p.getSalePrice();
-            }
-        }
+        var rows = fuelPriceRepository.findCheapest(city, state, product);
 
-        Cheapest cheapestResponse = new Cheapest();
-        MinimalFuelStation minimalFuelStation = new MinimalFuelStation();
-        if (fuelStation == null) {
-            return null;
-        }
-        minimalFuelStation.setCnpj(StringFormat.format(fuelStation.getCnpj()));
-        minimalFuelStation.setName(StringFormat.format(fuelStation.getName()));
-        minimalFuelStation.setNeighborhood(StringFormat.format(fuelStation.getAddress().getNeighborhood()));
-        cheapestResponse.setCheapestPrice(cheapest);
-        cheapestResponse.setProduct(StringFormat.format(product));
-        cheapestResponse.setStation(minimalFuelStation);
-        Map<String, String> context = new HashMap<>();
-        context.put("city", StringFormat.format(city));
-        context.put("state", StringFormat.format(state));
-        cheapestResponse.setContext(context);
-        return cheapestResponse;
+        if (rows.isEmpty()) return null;
+
+        var r = rows.get(0);
+
+        MinimalFuelStation station = new MinimalFuelStation();
+        station.setCnpj(StringFormat.format(r.cnpj()));
+        station.setName(StringFormat.format(r.name()));
+        station.setNeighborhood(StringFormat.format(r.neighborhood()));
+
+        Cheapest response = new Cheapest();
+        response.setCheapestPrice(r.price());
+        response.setProduct(StringFormat.format(product));
+        response.setStation(station);
+        response.setContext(Map.of(
+                "city", StringFormat.format(city),
+                "state", StringFormat.format(state)
+        ));
+
+        return response;
     }
 
     @Cacheable(
@@ -116,7 +111,8 @@ public class FuelService {
             key = "#state + ':' + #city + ':' + #product"
     )
     public AvgResponse getTopPrices(String state, String city, String product) {
-        List<FuelPrice> fuelPrices = fuelPriceRepository.findByCityAndProduct(city, state, product);
+        List<FuelPrice> fuelPrices = fuelPriceRepository.findByCityAndProductFetched(city, state, product);
+        log.info("list size: {}" ,fuelPrices.size());
         if(fuelPrices.isEmpty()) return null;
         Map<FuelStation, List<FuelPrice>> pricesByStation = fuelPrices.stream()
                 .collect(Collectors.groupingBy(FuelPrice::getStation));
@@ -137,7 +133,7 @@ public class FuelService {
             key = "#state + ':' + #city + ':' + #product"
     )
     public AvgResponse getWorstPrices(String state, String city, String product) {
-        List<FuelPrice> fuelPrices = fuelPriceRepository.findByCityAndProduct(city, state, product);
+        List<FuelPrice> fuelPrices = fuelPriceRepository.findByCityAndProductFetched(city, state, product);
         if(fuelPrices.isEmpty()) return null;
         Map<FuelStation, List<FuelPrice>> pricesByStation = fuelPrices.stream()
                 .collect(Collectors.groupingBy(FuelPrice::getStation));

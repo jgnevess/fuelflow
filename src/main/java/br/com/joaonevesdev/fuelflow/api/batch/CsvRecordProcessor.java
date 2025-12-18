@@ -42,7 +42,11 @@ public class CsvRecordProcessor {
             String neighborhood = getValue(record, "Bairro");
             String municipality = getValue(record, "Municipio");
             String state = getValue(record, "Estado - Sigla");
-            String region = getValue(record, "Regiao - Sigla");
+            String region = record.toMap().entrySet().stream()
+                    .filter(e -> e.getKey().toLowerCase().contains("regiao"))
+                    .map(Map.Entry::getValue)
+                    .findFirst()
+                    .orElse(null);;
             String cep = getValue(record, "Cep");
 
             if (street == null || municipality == null || state == null) {

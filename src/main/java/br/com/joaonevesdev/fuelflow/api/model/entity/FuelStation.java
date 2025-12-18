@@ -63,9 +63,9 @@ public class FuelStation {
                 .cnpj(cnpj)
                 .address(address)
                 .number(number != null ? number.trim() : null)
-                .complement(complement != null ? complement.trim() : null)
-                .name(name != null ? name.trim() : null)
-                .brand(brand != null ? brand.trim() : null)
+                .complement(complement != null ? complement.trim().toLowerCase() : null)
+                .name(name != null ? name.trim().toLowerCase() : null)
+                .brand(brand != null ? brand.trim().toLowerCase() : null)
                 .build();
     }
 

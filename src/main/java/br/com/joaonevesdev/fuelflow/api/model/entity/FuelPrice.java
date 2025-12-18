@@ -74,7 +74,7 @@ public class FuelPrice {
         return FuelPrice.builder()
                 .station(station)
                 .collectionDate(collectionDate)
-                .product(product != null ? product.trim() : null)
+                .product(product != null ? product.trim().toLowerCase() : null)
                 .salePrice(parsePrice(salePriceStr))
                 .purchasePrice(purchasePriceStr != null ? parsePrice(purchasePriceStr) : null)
                 .measurementUnit(measurementUnit != null ? measurementUnit.trim() : null)
