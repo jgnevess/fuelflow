@@ -18,9 +18,7 @@ O projeto é voltado para portfólio profissional, com foco em backend engineeri
 - PostgreSQL
 - Redis (cache)
 - Swagger / OpenAPI
-- Docker (ambiente local)
-- HTML + CSS + JS (frontend simples para demonstração)
-- Tailwind ou Bootstrap (no máximo)
+- Docker
 
 NÃO utilizar frameworks frontend como React, Angular ou Vue.
 
@@ -29,7 +27,6 @@ NÃO utilizar frameworks frontend como React, Angular ou Vue.
 ## Princípios do Projeto
 - Backend-first
 - API pública (sem autenticação por enquanto)
-- Frontend apenas para visualização e demonstração
 - Código organizado, sem overengineering
 - Cache aplicado apenas onde faz sentido
 - Decisões técnicas devem ser justificáveis
@@ -93,21 +90,10 @@ Não cachear:
 
 ---
 
-## Frontend (Demonstração)
-O frontend deve:
-- Consumir a API real
-- Exibir dados como:
-    - tabelas
-    - rankings
-    - indicadores simples
-- Não conter lógica de negócio
-- Servir apenas como vitrine técnica
-
----
 
 ## Segurança
 - API pública
-- CORS liberado apenas para o frontend do projeto
+- CORS fechado
 - Rate limit opcional
 - Sem autenticação por enquanto
 
@@ -117,7 +103,7 @@ O frontend deve:
 - Não transformar em sistema comercial
 - Não criar painel administrativo
 - Não adicionar login
-- Não usar frameworks frontend complexos
+- Não adicionar frontend
 - Não fazer overengineering
 
 ---
