@@ -11,6 +11,10 @@ jobs:
     env:
       DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/fuelflow-api
       IMAGE_TAG: latest
+      DB_URL: ${{ secrets.DB_URL }}
+      DB_USER: ${{ secrets.DB_USER }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+
 
     steps:
       - name: Checkout Repository

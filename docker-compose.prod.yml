@@ -7,7 +7,7 @@ services:
     environment:
       POSTGRES_DB: fuelflow_db
       POSTGRES_USER: fuelflow_joao_user
-      POSTGRES_PASSWORD: Pc3P9LswUCge4zuVireg
+      POSTGRES_PASSWORD: Pc3P9LswUCge4zuVireg # senha invalida
     ports:
       - "5432:5432"
     volumes:
@@ -39,7 +39,7 @@ services:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/fuelflow_db
       SPRING_DATASOURCE_USERNAME: fuelflow_joao_user
-      SPRING_DATASOURCE_PASSWORD: Pc3P9LswUCge4zuVireg
+      SPRING_DATASOURCE_PASSWORD: Pc3P9LswUCge4zuVireg # senha invalida
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: "6379"
     depends_on:
