@@ -6,6 +6,7 @@ import br.com.joaonevesdev.fuelflow.api.model.entity.FuelStation;
 import br.com.joaonevesdev.fuelflow.api.repository.AddressRepository;
 import br.com.joaonevesdev.fuelflow.api.repository.FuelPriceRepository;
 import br.com.joaonevesdev.fuelflow.api.repository.FuelStationRepository;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
@@ -33,7 +34,7 @@ public class CsvImportService {
     private final FuelPriceRepository priceRepository;
     private final CsvRecordProcessor csvRecordProcessor;
 
-    public ImportResult ImportFile(Path dest) throws IOException {
+    public ImportResult importFile(Path dest) throws IOException {
         long maxLines = Files.lines(dest).count();
 
         try {
@@ -159,6 +160,7 @@ public class CsvImportService {
         return priceRepository.count();
     }
 
+    @Getter
     public static class ImportResult {
         private final boolean success;
         private final String message;
@@ -184,10 +186,5 @@ public class CsvImportService {
             return new ImportResult(false, errorMessage, 0, 0, 0);
         }
 
-        public boolean isSuccess() { return success; }
-        public String getMessage() { return message; }
-        public int getLinesProcessed() { return linesProcessed; }
-        public int getStationsCreated() { return stationsCreated; }
-        public int getPricesCreated() { return pricesCreated; }
     }
 }

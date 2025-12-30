@@ -28,7 +28,7 @@ public class CsvBatchRunner implements CommandLineRunner {
 
         log.info("Iniciando importação do CSV: {}", csvPath);
         Path path = Path.of(csvPath);
-        csvImportService.ImportFile(path);
+        csvImportService.importFile(path);
         log.info("Importação finalizada.");
         System.exit(0);
     }

@@ -83,25 +83,25 @@ public interface FuelPriceRepository extends JpaRepository<FuelPrice, Long> {
     );
 
     @Query(value = """
-        select new com.fuelflow.dto.CheapestRow(
-            fp.salePrice,
-            fs.cnpj,
-            fs.name,
-            a.neighborhood
-        )
-        from FuelPrice fp
-        join fp.station fs
-        join fs.address a
-        where fp.product = :product
-          and a.municipality = :municipality
-          and a.state = :state
-          and fp.collectionDate = (
-              select max(fp2.collectionDate)
-              from FuelPrice fp2
-              where fp2.station = fp.station
-                and fp2.product = fp.product
-          )
-        order by fp.salePrice asc
+            SELECT
+                fp.sale_price,
+                fs.cnpj,
+                fs.name,
+                a.neighborhood
+            FROM fuel_prices fp
+            JOIN fuel_stations fs ON fs.cnpj = fp.station_cnpj
+            JOIN addresses a ON a.id = fs.address_id
+            WHERE fp.product = :product
+              AND a.municipality = :municipality
+              AND a.state = :state
+              AND fp.collection_date = (
+                  SELECT MAX(fp2.collection_date)
+                  FROM fuel_prices fp2
+                  WHERE fp2.station_cnpj = fp.station_cnpj
+                    AND fp2.product = fp.product
+              )
+            ORDER BY fp.sale_price ASC;
+            
     """, nativeQuery = true)
     List<CheapestRow> findCheapest(
             @Param("municipality") String municipality,

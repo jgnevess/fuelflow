@@ -7,6 +7,7 @@ target/
 *.tfstate
 *.tfstate.backup
 *.sql
+.env
 
 ### STS ###
 .apt_generated
