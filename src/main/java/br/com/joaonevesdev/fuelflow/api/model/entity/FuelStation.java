@@ -56,6 +56,19 @@ public class FuelStation {
     @Builder.Default
     private List<FuelPrice> prices = new ArrayList<>();
 
+    public FuelStation(String cnpj, Address address, String number, String complement, String name, String brand, String corporateName, Boolean active, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.cnpj = cnpj;
+        this.address = address;
+        this.number = number;
+        this.complement = complement;
+        this.name = name;
+        this.brand = brand;
+        this.corporateName = corporateName;
+        this.active = active;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
     public static FuelStation fromCsvRecord(String cnpj, Address address,
                                             String number, String complement,
                                             String name, String brand) {

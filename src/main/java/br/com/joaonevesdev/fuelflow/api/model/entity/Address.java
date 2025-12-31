@@ -51,8 +51,22 @@ public class Address {
     private Double latitude;
     private Double longitude;
 
+    public Address(String street, String neighborhood, String municipality, String state, String region, String cep, Double latitude, Double longitude, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.street = street;
+        this.neighborhood = neighborhood;
+        this.municipality = municipality;
+        this.state = state;
+        this.region = region;
+        this.cep = cep;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.hash = hash;
+        this.stations = stations;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
 
-public static class FuelPriceId {
+    public static class FuelPriceId {
 }    @NaturalId
     @Column(unique = true, length = 32)
     private String hash;
