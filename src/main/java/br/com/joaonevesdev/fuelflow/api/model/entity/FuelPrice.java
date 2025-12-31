@@ -49,6 +49,8 @@ public class FuelPrice {
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
+
+
     public static BigDecimal parsePrice(String priceStr) {
         if (priceStr == null || priceStr.trim().isEmpty()) {
             return null;
