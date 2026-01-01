@@ -89,6 +89,11 @@ public class FuelService {
 
         var r = rows.get(0);
 
+        Optional<FuelStation> opt = fuelStationRepository.findByCnpj(r.cnpj());
+        if (opt.isEmpty()) return null;
+
+        FuelStation fuelStation = opt.get();
+
         MinimalFuelStation station = new MinimalFuelStation();
         station.setCnpj(StringFormat.format(r.cnpj()));
         station.setName(StringFormat.format(r.name()));
@@ -98,6 +103,8 @@ public class FuelService {
         response.setCheapestPrice(r.price());
         response.setProduct(StringFormat.format(product));
         response.setStation(station);
+        response.setFullAddress(fuelStation);
+        response.setMapsLink();
         response.setContext(Map.of(
                 "city", StringFormat.format(city),
                 "state", StringFormat.format(state)
